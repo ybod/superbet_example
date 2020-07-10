@@ -6,6 +6,7 @@ defmodule Superbet do
   alias Superbet.Hackney
 
   @req_headers [{"Accept", "application/json"}, {"Accept-Charset", "UTF-8"}, {"Accept-encoding", "deflate"}]
+  # this API seems to be slow so we need to give longer timeout
   @req_options [{:recv_timeout, 30_000}]
 
   @host "https://offer1.superbet.ro"
@@ -14,8 +15,8 @@ defmodule Superbet do
     url = "#{@host}/matches/getMatchesByIds?matchIds=#{match_id}"
 
     with {:ok, headers, resp_body} <- Hackney.get(url, "", headers: @req_headers, options: @req_options),
-         uncompresses_body = uncompress_body(headers, resp_body),
-         {:ok, json_resp} <- Jason.decode(uncompresses_body),
+         uncompressed_body = uncompress_body(headers, resp_body),
+         {:ok, json_resp} <- Jason.decode(uncompressed_body),
          {:ok, data} <- get_data(json_resp) do
       {:ok, data}
     end
